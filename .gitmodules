@@ -1,3 +1,16 @@
 [submodule "packages/nomad-FAIR"]
 	path = packages/nomad-FAIR
 	url = https://gitlab.mpcdf.mpg.de/nomad-lab/nomad-FAIR.git
+	branch = develop
+[submodule "packages/nomad-simulations"]
+	path = packages/nomad-simulations
+	url = https://github.com/FAIRmat-NFDI/nomad-simulations.git
+	branch = develop
+[submodule "packages/nomad-file-parser"]
+	path = packages/nomad-file-parser
+	url = https://github.com/FAIRmat-NFDI/nomad-file-parser.git
+	branch = develop
+[submodule "packages/nomad-simulation-parsers"]
+	path = packages/nomad-simulation-parsers
+	url = https://github.com/FAIRmat-NFDI/nomad-parser-plugins-simulation.git
+	branch = develop
