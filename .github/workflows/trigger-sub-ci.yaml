@@ -2,8 +2,8 @@ name: Trigger sub-CI
 
 # Fans out to the CI of the GitHub-hosted dependency repositories so a
 # coordinated set of branches (same branch name across repos) can be verified
-# together. GitLab-hosted dependencies (nomad-FAIR, nomad-gui) cannot be
-# dispatched from here; trigger their pipelines on GitLab directly.
+# together. GitLab-hosted dependencies (nomad-FAIR, nomad-gui) are out of
+# scope and are not dispatched.
 #
 # Requires the `SUB_CI_TOKEN` secret: a fine-grained PAT with `actions: write`
 # on the dependency repositories. The target workflow must declare a

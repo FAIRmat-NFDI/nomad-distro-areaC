@@ -50,6 +50,6 @@ gh workflow run trigger-sub-ci.yaml -f ref=<branch> \
   -f repos=nomad-simulations,nomad-parser-plugins-simulation,nomad-file-parser
 ```
 
-It dispatches the `actions.yml` CI of each listed GitHub repository on the given ref and links the resulting runs in the workflow summary. Two caveats apply. First, dispatching requires the `SUB_CI_TOKEN` repository secret, a fine-grained personal access token with `actions: write` on the dependency repositories, and the target CI must itself declare a `workflow_dispatch` trigger; repositories where either is missing are reported as warnings. Second, the GitLab-hosted repositories (`nomad-FAIR`, `nomad-gui`) cannot be dispatched from GitHub Actions; trigger their pipelines directly on GitLab.
+It dispatches the `actions.yml` CI of each listed GitHub repository on the given ref and links the resulting runs in the workflow summary. Two caveats apply. First, dispatching requires the `SUB_CI_TOKEN` repository secret, a fine-grained personal access token with `actions: write` on the dependency repositories, and the target CI must itself declare a `workflow_dispatch` trigger; repositories where either is missing are reported as warnings. Second, the GitLab-hosted repositories (`nomad-FAIR`, `nomad-gui`) are not covered: triggering their pipelines is out of scope for this distribution.
 
 Independently of remote CI, the whole coordinated state can be verified locally from the workspace: `uv sync` to materialize it, then run the test suites of the affected packages with `uv run --directory packages/<package> pytest`.
