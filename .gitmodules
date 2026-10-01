@@ -18,3 +18,7 @@
 	path = packages/nomad-simulation-parser-test-fixtures
 	url = https://github.com/FAIRmat-NFDI/nomad-simulation-parser-test-fixtures.git
 	branch = main
+[submodule "packages/nomad-results-normalizer"]
+	path = packages/nomad-results-normalizer
+	url = https://github.com/FAIRmat-NFDI/nomad-results-normalizer.git
+	branch = main
