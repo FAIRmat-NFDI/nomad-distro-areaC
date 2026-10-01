@@ -15,6 +15,8 @@ dependencies = [
 
 [tool.uv.workspace]
 members = ["packages/*"]
+# Data-only submodule (no pyproject.toml), not a workspace member.
+exclude = ["packages/nomad-simulation-parser-test-fixtures"]
 
 [tool.uv.sources]
 nomad-lab = { workspace = true }
