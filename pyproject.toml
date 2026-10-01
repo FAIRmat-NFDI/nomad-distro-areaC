@@ -6,7 +6,7 @@ readme = "README.md"
 requires-python = ">=3.10"
 license = { file = "LICENSE" }
 dependencies = [
-  "nomad-gui>=2.0.0b2",
+  "nomad-gui",
   "nomad-lab[infrastructure]>=1.3.10",
   "nomad-simulations",
   "nomad-simulation-parsers",
@@ -18,6 +18,9 @@ members = ["packages/*"]
 
 [tool.uv.sources]
 nomad-lab = { workspace = true }
+# The nomad-gui Python package lives in the infra/ subdirectory; the repo root
+# is the Vite/React app and carries no pyproject.toml.
+nomad-gui = { git = "https://gitlab.mpcdf.mpg.de/nomad-lab/nomad-gui.git", branch = "develop", subdirectory = "infra" }
 nomad-simulations = { workspace = true }
 nomad-simulation-parsers = { workspace = true }
 nomad-file-parser = { workspace = true }
