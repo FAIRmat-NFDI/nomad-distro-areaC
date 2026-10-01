@@ -1,0 +1,56 @@
+name: Trigger sub-CI
+
+# Fans out to the CI of the GitHub-hosted dependency repositories so a
+# coordinated set of branches (same branch name across repos) can be verified
+# together. GitLab-hosted dependencies (nomad-FAIR, nomad-gui) cannot be
+# dispatched from here; trigger their pipelines on GitLab directly.
+#
+# Requires the `SUB_CI_TOKEN` secret: a fine-grained PAT with `actions: write`
+# on the dependency repositories. The target workflow must declare a
+# `workflow_dispatch` trigger; repositories where it is missing are reported
+# as warnings, not failures.
+
+on:
+  workflow_dispatch:
+    inputs:
+      ref:
+        description: "Branch (or tag) to run the dependency CIs on"
+        required: true
+        default: "develop"
+      repos:
+        description: "Comma-separated repository names to trigger (subset of the default list)"
+        required: false
+        default: "nomad-simulations,nomad-parser-plugins-simulation,nomad-file-parser"
+
+jobs:
+  dispatch:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Dispatch dependency CIs
+        env:
+          GH_TOKEN: ${{ secrets.SUB_CI_TOKEN }}
+          REF: ${{ inputs.ref }}
+          REPOS: ${{ inputs.repos }}
+        run: |
+          failed=0
+          for repo in ${REPOS//,/ }; do
+            echo "::group::FAIRmat-NFDI/$repo @ $REF"
+            if gh workflow run actions.yml --repo "FAIRmat-NFDI/$repo" --ref "$REF"; then
+              echo "dispatched actions.yml on FAIRmat-NFDI/$repo@$REF"
+            else
+              echo "::warning title=FAIRmat-NFDI/$repo::could not dispatch actions.yml on ref '$REF'. Either the ref does not exist or the workflow lacks a 'workflow_dispatch' trigger."
+              failed=$((failed + 1))
+            fi
+            echo "::endgroup::"
+          done
+          echo "done; $failed repositories could not be dispatched"
+
+      - name: Link to dispatched runs
+        env:
+          REF: ${{ inputs.ref }}
+          REPOS: ${{ inputs.repos }}
+        run: |
+          echo "## Dispatched runs" >> "$GITHUB_STEP_SUMMARY"
+          for repo in ${REPOS//,/ }; do
+            echo "- [FAIRmat-NFDI/$repo actions](https://github.com/FAIRmat-NFDI/$repo/actions?query=branch%3A$REF)" >> "$GITHUB_STEP_SUMMARY"
+          done
