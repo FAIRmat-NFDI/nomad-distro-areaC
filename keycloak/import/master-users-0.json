@@ -1,0 +1,26 @@
+{
+  "realm" : "master",
+  "users" : [ {
+    "id" : "22f5ea54-cf73-4be0-8a17-b8f6208ed14c",
+    "username" : "admin",
+    "emailVerified" : false,
+    "createdTimestamp" : 1739277109488,
+    "enabled" : true,
+    "totp" : false,
+    "credentials" : [ {
+      "id" : "a4bdc719-0c3f-418b-b08a-a56fe2337f99",
+      "type" : "password",
+      "createdDate" : 1739277109805,
+      "secretData" : "{\"value\":\"FA0mt7YqJ6auexXbG9GnSV1kvAx75Kbl8ZA7yIbBDnA=\",\"salt\":\"WM7i/mUci7dFxX3OV6f4UA==\",\"additionalParameters\":{}}",
+      "credentialData" : "{\"hashIterations\":5,\"algorithm\":\"argon2\",\"additionalParameters\":{\"hashLength\":[\"32\"],\"memory\":[\"7168\"],\"type\":[\"id\"],\"version\":[\"1.3\"],\"parallelism\":[\"1\"]}}"
+    } ],
+    "disableableCredentialTypes" : [ ],
+    "requiredActions" : [ ],
+    "realmRoles" : [ "default-roles-master", "admin" ],
+    "clientRoles" : {
+      "fairdi_nomad_test-realm" : [ "manage-events", "query-groups", "manage-authorization", "query-realms", "manage-clients", "view-events", "query-users", "view-users", "manage-users", "view-identity-providers", "view-clients", "manage-realm", "create-client", "query-clients", "view-realm", "view-authorization", "manage-identity-providers" ]
+    },
+    "notBefore" : 0,
+    "groups" : [ ]
+  } ]
+}
