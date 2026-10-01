@@ -32,7 +32,7 @@ uv run poe start   # API + new GUI at http://localhost:8000/nomad-oasis/gui/v2/
 
 Run a package's tests from the workspace with `uv run --directory packages/<package> pytest`.
 
-Unlike upstream, this distribution commits its `nomad.yaml`. It points authentication at the local Keycloak that `docker compose` starts on port 8008 (realm `fairdi_nomad_test`, imported from `keycloak/import/`, with test users such as `test`/`password`), and it restricts the loaded plugins to the Area C stack through wildcard patterns in `plugins.entry_points.include` (for example `nomad_simulation_parsers.*`), plus the two built-in search apps the GUI uses. Wildcard support in the include/exclude lists landed on `nomad-FAIR`'s `develop` in September 2026, which this distribution tracks.
+Unlike upstream, this distribution commits its `nomad.yaml`. Authentication uses the central NOMAD Keycloak with the `fairdi_nomad_test` realm (shared test users such as `test`/`password`), and the loaded plugins are restricted to the Area C stack through wildcard patterns in `plugins.entry_points.include` (for example `nomad_simulation_parsers.*`), plus the two built-in search apps the GUI uses. Wildcard support in the include/exclude lists landed on `nomad-FAIR`'s `develop` in September 2026, which this distribution tracks.
 
 ## Coordinated development protocol
 

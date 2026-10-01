@@ -1,6 +1,4 @@
 keycloak:
-  server_url: 'http://localhost:8008/'
-  public_server_url: 'http://localhost:8008/'
   realm_name: 'fairdi_nomad_test'
 
 plugins:
