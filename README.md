@@ -44,7 +44,12 @@ The purpose of this distribution is to make changes that span several repositori
 - Starting bases are `main` and, in the future, additional standard setups published as `std/<branch name>`; coordinated work forks from and merges back into one of these.
 - Feature branches carry their owner's initials as a prefix, e.g. `jfr/<branch name>`, and the same prefixed name is used in every repository the change touches.
 
-**Pull requests.** Open a pull request in each affected package repository (base `develop`) and one in this repository (base `main`). The distro pull request is the coordination point: its description lists and links every package pull request, and each package pull request links back to it. Merge in dependency order, leaves first: package pull requests are merged into their `develop` branches, then the distro branch is updated to point the submodules at the resulting `develop` commits, and finally the distro pull request is merged. A distro pull request must never be merged while its submodule pointers still reference branches that have been deleted or rewritten.
+**Pull requests.**
+
+- Open a pull request in each affected package repository (base `develop`) and one in this repository (base: the starting branch, e.g. `main`).
+- The distro pull request is the coordination point: its description lists and links every package pull request, and each package pull request links back to it.
+- Merge in dependency order, leaves first: package pull requests are merged into their `develop` branches, then the distro branch is updated to point the submodules at the resulting `develop` commits, and finally the distro pull request is merged.
+- Never merge a distro pull request while its submodule pointers still reference branches that have been deleted or rewritten.
 
 **CI verification.** Each package repository runs its own CI when its branch is pushed, so the per-repository checks come for free. To verify the coordinated state on demand, this repository provides the `Trigger sub-CI` workflow (`.github/workflows/trigger-sub-ci.yaml`). Run it from the Actions tab or with the CLI:
 
