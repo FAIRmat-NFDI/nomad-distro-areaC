@@ -6,7 +6,7 @@ For the general setup instructions (Docker services, `uv` installation, adding o
 
 ## What this distribution tracks
 
-All coordinated repositories follow their `develop` branches:
+Each coordinated repository follows the branch listed below — `develop` wherever one exists, otherwise `main`:
 
 | Package | Repository | Form |
 | --- | --- | --- |
@@ -18,7 +18,7 @@ All coordinated repositories follow their `develop` branches:
 | `nomad-gui` | [nomad-gui](https://gitlab.mpcdf.mpg.de/nomad-lab/nomad-gui) (GitLab) | git pin on `develop` (`infra/` subdirectory), not editable |
 | — | [nomad-simulation-parser-test-fixtures](https://github.com/FAIRmat-NFDI/nomad-simulation-parser-test-fixtures) | submodule on `main`, data only |
 
-The submodules declare `branch = develop` in `.gitmodules`, and the weekly `Update Submodules` workflow opens a pull request that advances all pointers to the current `develop` tips. Note that `nomad-simulation-parsers` pins `nomad-simulations` and `nomad-file-parser` to their `develop` branches in its own `pyproject.toml`; the workspace drops these pins through `override-dependencies` so that the local checkouts are used instead.
+Each submodule declares its tracked branch in `.gitmodules`, and the weekly `Update Submodules` workflow opens a pull request that advances all pointers to the current tips. Note that `nomad-simulation-parsers` pins `nomad-simulations` and `nomad-file-parser` to their `develop` branches in its own `pyproject.toml`; the workspace drops these pins through `override-dependencies` so that the local checkouts are used instead.
 
 The test-fixtures submodule carries no Python package: it stores large test inputs for `nomad-simulation-parsers`, with paths mirroring `tests/data/` in the parser repository, and is excluded from the `uv` workspace. It tracks `main` because the repository has no `develop` branch.
 
@@ -27,7 +27,7 @@ The test-fixtures submodule carries no Python package: it stores large test inpu
 ```bash
 git clone --recurse-submodules git@github.com:FAIRmat-NFDI/nomad-distro-areaC.git
 cd nomad-distro-areaC
-uv run poe setup   # starts docker services, creates nomad.yaml
+uv run poe setup   # starts docker services (nomad.yaml is committed)
 uv run poe start   # API + new GUI at http://localhost:8000/nomad-oasis/gui/v2/
 ```
 
@@ -39,25 +39,25 @@ Unlike upstream, this distribution commits its `nomad.yaml`. Authentication uses
 
 The purpose of this distribution is to make changes that span several repositories reviewable and testable as one unit. The protocol has three parts: a branch convention, a coordinated set of pull requests, and CI verification.
 
-**Branches.** For a coordinated change, pick one descriptive branch name and use it in every repository the change touches. Create the branch from `develop` in each affected package repository, and a branch with the same name from this repository's starting base. In the distro branch, commit the submodule pointers at the tips of the package branches (work inside `packages/<package>` as in any git checkout: branch, commit, push; then `git add packages/<package>` in the distro and commit the moved pointer). This way the distro branch is a reproducible snapshot of the whole coordinated state, and `uv sync` materializes exactly that state. The branch namespace in this repository follows two conventions:
+**Branches.** For a coordinated change, pick one descriptive branch name and use it in every repository the change touches. Create the branch from the tracked branch (usually `develop`) in each affected package repository, and a branch with the same name from this repository's starting base. In the distro branch, commit the submodule pointers at the tips of the package branches (work inside `packages/<package>` as in any git checkout: branch, commit, push; then `git add packages/<package>` in the distro and commit the moved pointer). The submodule pointers make the distro branch an exact snapshot of the coordinated state, which `uv sync` materializes; the one floating element is `nomad-gui`, which resolves from its `develop` branch at lock time. The branch namespace in this repository follows two conventions:
 
 - Starting bases are `main` and, in the future, additional standard setups published as `std/<branch name>`; coordinated work forks from and merges back into one of these.
 - Feature branches carry their owner's initials as a prefix, e.g. `jfr/<branch name>`, and the same prefixed name is used in every repository the change touches.
 
 **Pull requests.**
 
-- Open a pull request in each affected package repository (base `develop`) and one in this repository (base: the starting branch, e.g. `main`).
+- Open a pull request in each affected package repository (base: its tracked branch, usually `develop`) and one in this repository (base: the starting branch, e.g. `main`).
 - The distro pull request is the coordination point: its description lists and links every package pull request, and each package pull request links back to it.
-- Merge in dependency order, leaves first: package pull requests are merged into their `develop` branches, then the distro branch is updated to point the submodules at the resulting `develop` commits, and finally the distro pull request is merged.
+- Merge in dependency order, leaves first: package pull requests are merged into their tracked branches, then the distro branch is updated to point the submodules at the resulting commits, and finally the distro pull request is merged.
 - Never merge a distro pull request while its submodule pointers still reference branches that have been deleted or rewritten.
 
-**CI verification.** Each package repository runs its own CI when its branch is pushed, so the per-repository checks come for free. To verify the coordinated state on demand, this repository provides the `Trigger sub-CI` workflow (`.github/workflows/trigger-sub-ci.yaml`). Run it from the Actions tab or with the CLI:
+**CI verification.** Each package repository runs its own CI when its branch is pushed, so the per-repository checks come for free. To re-run those per-repository checks on demand, this repository provides the `Trigger sub-CI` workflow (`.github/workflows/trigger-sub-ci.yaml`). Run it from the Actions tab or with the CLI:
 
 ```bash
 gh workflow run trigger-sub-ci.yaml -f ref=<branch> \
   -f repos=nomad-simulations,nomad-parser-plugins-simulation,nomad-file-parser
 ```
 
-It dispatches the `actions.yml` CI of each listed GitHub repository on the given ref and links the resulting runs in the workflow summary. The GitLab-hosted repositories (`nomad-FAIR`, `nomad-gui`) are not covered. If a repository is reported as a warning instead of a dispatch, the `SUB_CI_TOKEN` secret or the target's `workflow_dispatch` trigger needs attention from a maintainer.
+It dispatches the `actions.yml` CI of each listed GitHub repository on the given ref and links the resulting runs in the workflow summary. Two properties to be aware of: each repository tests its branch in isolation, with its own dependency resolution rather than the distro workspace, and the dispatch is fire-and-forget — results are checked through the summary links, not reflected in the trigger run. The GitLab-hosted repositories (`nomad-FAIR`, `nomad-gui`) are not covered. If a repository is reported as a warning instead of a dispatch, the `SUB_CI_TOKEN` secret or the target's `workflow_dispatch` trigger needs attention from a maintainer.
 
-Independently of remote CI, the whole coordinated state can be verified locally from the workspace: `uv sync` to materialize it, then run the test suites of the affected packages with `uv run --directory packages/<package> pytest`.
+The combined state — all coordinated branches resolved together through the workspace overrides — is verified locally: `uv sync` to materialize it, then run the test suites of the affected packages with `uv run --directory packages/<package> pytest`.

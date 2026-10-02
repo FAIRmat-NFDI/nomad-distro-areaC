@@ -3,7 +3,7 @@ name = "nomad-distribution"
 description = "nomad distribution template"
 version = "0.1"
 readme = "README.md"
-requires-python = ">=3.10"
+requires-python = ">=3.11"
 license = { file = "LICENSE" }
 dependencies = [
   "nomad-gui",
@@ -40,8 +40,8 @@ extra-index-url = [
 required-version = ">=0.5.14"
 constraint-dependencies = ["flatdict>=4.1.0"]
 # nomad-simulation-parsers pins these to git+...@develop; the overrides drop the
-# pins so resolution falls back to the local workspace checkouts (see README,
-# "Overriding a dependent's version pin").
+# pins so resolution falls back to the local workspace checkouts (see
+# "Overriding a dependent's version pin" in the nomad-distro-dev README).
 override-dependencies = ["nomad-simulations", "nomad-file-parser"]
 
 [dependency-groups]

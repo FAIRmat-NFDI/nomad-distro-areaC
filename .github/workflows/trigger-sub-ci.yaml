@@ -1,9 +1,12 @@
 name: Trigger sub-CI
 
-# Fans out to the CI of the GitHub-hosted dependency repositories so a
-# coordinated set of branches (same branch name across repos) can be verified
-# together. GitLab-hosted dependencies (nomad-FAIR, nomad-gui) are out of
-# scope and are not dispatched.
+# Fans out to the CI of the GitHub-hosted dependency repositories so each
+# branch of a coordinated set (same branch name across repos) gets its own
+# CI re-run on demand. Each repository tests in isolation with its own
+# dependency resolution, and the dispatch is fire-and-forget (results via
+# the summary links); the combined workspace is verified locally with
+# `uv sync` + pytest. GitLab-hosted dependencies (nomad-FAIR, nomad-gui)
+# are out of scope and are not dispatched.
 #
 # Requires the `SUB_CI_TOKEN` secret: a fine-grained PAT with `actions: write`
 # on the dependency repositories. The target workflow must declare a
@@ -38,7 +41,7 @@ jobs:
             if gh workflow run actions.yml --repo "FAIRmat-NFDI/$repo" --ref "$REF"; then
               echo "dispatched actions.yml on FAIRmat-NFDI/$repo@$REF"
             else
-              echo "::warning title=FAIRmat-NFDI/$repo::could not dispatch actions.yml on ref '$REF'. Either the ref does not exist or the workflow lacks a 'workflow_dispatch' trigger."
+              echo "::warning title=FAIRmat-NFDI/$repo::could not dispatch actions.yml on ref '$REF'. The ref does not exist, the workflow lacks a 'workflow_dispatch' trigger, or the SUB_CI_TOKEN secret is missing or lacks 'actions: write' on this repository."
               failed=$((failed + 1))
             fi
             echo "::endgroup::"
