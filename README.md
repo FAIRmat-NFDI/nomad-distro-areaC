@@ -25,8 +25,8 @@ The test-fixtures submodule carries no Python package: it stores large test inpu
 ## Quickstart
 
 ```bash
-git clone --recurse-submodules git@github.com:FAIRmat-NFDI/nomad-distro-areaC.git
-cd nomad-distro-areaC
+git clone --recurse-submodules git@github.com:FAIRmat-NFDI/nomad-distro-dev-areaC.git
+cd nomad-distro-dev-areaC
 uv run poe setup   # starts docker services (nomad.yaml is committed)
 uv run poe start   # API + new GUI at http://localhost:8000/nomad-oasis/gui/v2/
 ```

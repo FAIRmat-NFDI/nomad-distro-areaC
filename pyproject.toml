@@ -20,6 +20,7 @@ members = ["packages/*"]
 exclude = ["packages/nomad-simulation-parser-test-fixtures"]
 
 [tool.uv.sources]
+# nomad-lab is provided by the nomad-FAIR repository, checked out at packages/nomad-FAIR
 nomad-lab = { workspace = true }
 # The nomad-gui Python package lives in the infra/ subdirectory; the repo root
 # is the Vite/React app and carries no pyproject.toml.
