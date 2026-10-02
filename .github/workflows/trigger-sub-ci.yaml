@@ -17,13 +17,13 @@ on:
   workflow_dispatch:
     inputs:
       ref:
-        description: "Branch (or tag) to run the dependency CIs on"
+        description: "Branch (or tag) to run the dependency CIs on; 'tracked' resolves to each repository's default branch"
         required: true
-        default: "develop"
+        default: "tracked"
       repos:
         description: "Comma-separated repository names to trigger (subset of the default list)"
         required: false
-        default: "nomad-simulations,nomad-parser-plugins-simulation,nomad-file-parser"
+        default: "nomad-simulations,nomad-parser-plugins-simulation,nomad-file-parser,nomad-results-normalizer"
 
 jobs:
   dispatch:
@@ -37,11 +37,16 @@ jobs:
         run: |
           failed=0
           for repo in ${REPOS//,/ }; do
-            echo "::group::FAIRmat-NFDI/$repo @ $REF"
-            if gh workflow run actions.yml --repo "FAIRmat-NFDI/$repo" --ref "$REF"; then
-              echo "dispatched actions.yml on FAIRmat-NFDI/$repo@$REF"
+            if [ "$REF" = "tracked" ]; then
+              ref=$(gh api "repos/FAIRmat-NFDI/$repo" -q .default_branch)
             else
-              echo "::warning title=FAIRmat-NFDI/$repo::could not dispatch actions.yml on ref '$REF'. The ref does not exist, the workflow lacks a 'workflow_dispatch' trigger, or the SUB_CI_TOKEN secret is missing or lacks 'actions: write' on this repository."
+              ref="$REF"
+            fi
+            echo "::group::FAIRmat-NFDI/$repo @ $ref"
+            if gh workflow run actions.yml --repo "FAIRmat-NFDI/$repo" --ref "$ref"; then
+              echo "dispatched actions.yml on FAIRmat-NFDI/$repo@$ref"
+            else
+              echo "::warning title=FAIRmat-NFDI/$repo::could not dispatch actions.yml on ref '$ref'. The ref does not exist, the workflow lacks a 'workflow_dispatch' trigger, or the SUB_CI_TOKEN secret is missing or lacks 'actions: write' on this repository."
               failed=$((failed + 1))
             fi
             echo "::endgroup::"
@@ -55,5 +60,9 @@ jobs:
         run: |
           echo "## Dispatched runs" >> "$GITHUB_STEP_SUMMARY"
           for repo in ${REPOS//,/ }; do
-            echo "- [FAIRmat-NFDI/$repo actions](https://github.com/FAIRmat-NFDI/$repo/actions?query=branch%3A$REF)" >> "$GITHUB_STEP_SUMMARY"
+            if [ "$REF" = "tracked" ]; then
+              echo "- [FAIRmat-NFDI/$repo actions](https://github.com/FAIRmat-NFDI/$repo/actions)" >> "$GITHUB_STEP_SUMMARY"
+            else
+              echo "- [FAIRmat-NFDI/$repo actions](https://github.com/FAIRmat-NFDI/$repo/actions?query=branch%3A$REF)" >> "$GITHUB_STEP_SUMMARY"
+            fi
           done

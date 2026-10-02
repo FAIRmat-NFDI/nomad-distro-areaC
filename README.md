@@ -55,8 +55,10 @@ The purpose of this distribution is to make changes that span several repositori
 
 ```bash
 gh workflow run trigger-sub-ci.yaml -f ref=<branch> \
-  -f repos=nomad-simulations,nomad-parser-plugins-simulation,nomad-file-parser
+  -f repos=nomad-simulations,nomad-parser-plugins-simulation,nomad-file-parser,nomad-results-normalizer
 ```
+
+The `ref` input defaults to `tracked`, which resolves to each repository's default branch (`develop` or `main` per the table above) — the right choice for a routine health check. For a coordinated change, pass the shared branch name explicitly; repositories without that branch are reported as warnings.
 
 It dispatches the `actions.yml` CI of each listed GitHub repository on the given ref and links the resulting runs in the workflow summary. Two properties to be aware of: each repository tests its branch in isolation, with its own dependency resolution rather than the distro workspace, and the dispatch is fire-and-forget — results are checked through the summary links, not reflected in the trigger run. The GitLab-hosted repositories (`nomad-FAIR`, `nomad-gui`) are not covered. If a repository is reported as a warning instead of a dispatch, the `SUB_CI_TOKEN` secret or the target's `workflow_dispatch` trigger needs attention from a maintainer.
 
