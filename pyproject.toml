@@ -93,6 +93,12 @@ if not os.path.exists("nomad.yaml"):
 """
 interpreter = "python"
 
+# Static snapshot of the v2 GUI metainfo (the backend serves the same content
+# live under /nomad-oasis/gui/v2/metainfo.js).
+[tool.poe.tasks.metainfo]
+cmd = "python -W ignore -c \"from nomad_gui.apis import generate_metainfo; print(generate_metainfo())\""
+capture_stdout = "metainfo.js"
+
 [tool.poe.tasks.gui-env]
 cmd = "python -W ignore -m nomad.cli dev gui-env"
 capture_stdout = "packages/nomad-FAIR/gui/.env.development"
